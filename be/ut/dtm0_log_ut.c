@@ -171,7 +171,7 @@ void test_volatile_dtm0_log(void)
 	rc = m0_dtm0_clk_src_init(&cs, M0_DTM0_CS_PHYS);
 	M0_UT_ASSERT(rc == 0);
 
-	rc = m0_be_dtm0_log_init(&log, &cs, true);
+	rc = m0_be_dtm0_log_init(&log, &cs, false);
 	M0_UT_ASSERT(rc == 0);
 
 	for (i = 0; i < UT_DTM0_LOG_MAX_LOG_REC; ++i) {
@@ -269,7 +269,7 @@ void test_volatile_dtm0_log(void)
 	}
 
 	m0_mutex_unlock(&log->dl_lock);
-	m0_be_dtm0_log_fini(&log, true);
+	m0_be_dtm0_log_fini(&log);
 	m0_dtm0_clk_src_fini(&cs);
 }
 

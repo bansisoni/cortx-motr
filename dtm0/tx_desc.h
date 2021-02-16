@@ -121,7 +121,8 @@ struct m0_dtm0_tx_desc {
 
 /** Writes a deep copy of "src" into "dst". */
 M0_INTERNAL int m0_dtm0_tx_desc_copy(const struct m0_dtm0_tx_desc *src,
-				     struct m0_dtm0_tx_desc       *dst);
+				     struct m0_dtm0_tx_desc       *dst,
+                                     bool                          ispstore);
 
 /** Creates a new tx descriptor with the given number of participants. */
 M0_INTERNAL int m0_dtm0_tx_desc_init(struct m0_dtm0_tx_desc *td,

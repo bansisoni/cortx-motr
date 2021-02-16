@@ -184,6 +184,7 @@ struct m0_dtm0_clk_src;
 
 enum m0_be_dtm0_log_credit_op {
 	M0_DTML_CREATE,
+	M0_DTML_DESTROY,
 	M0_DTML_SENT,
 	M0_DTML_EXECUTED,
 	M0_DTML_PERSISTENT,
@@ -210,8 +211,7 @@ struct m0_be_dtm0_log {
 M0_INTERNAL int m0_be_dtm0_log_init(struct m0_be_dtm0_log **log,
                                     struct m0_dtm0_clk_src *cs,
                                     bool                    isvstore);
-M0_INTERNAL void m0_be_dtm0_log_fini(struct m0_be_dtm0_log **log,
-                                     bool                    isvstore);
+M0_INTERNAL void m0_be_dtm0_log_fini(struct m0_be_dtm0_log **log);
 
 // credit interface
 M0_INTERNAL void m0_be_dtm0_log_credit(enum m0_be_dtm0_log_credit_op op,

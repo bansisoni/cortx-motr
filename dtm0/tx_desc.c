@@ -60,14 +60,17 @@ M0_INTERNAL bool m0_dtm0_tid__invariant(const struct m0_dtm0_tid *tid)
 }
 
 /* Writes a deep copy of "src" into "dst". */
-M0_INTERNAL int m0_dtm0_tx_desc_copy(const struct m0_dtm0_tx_desc *src,
+M0_INTERNAL int m0_dtm0_tx_desc_copy(struct m0_be_dtm0_log        *log,
+                                     struct m0_be_tx              *tx,
+                                     struct m0_be_seg             *seg,
+                                     const struct m0_dtm0_tx_desc *src,
 				     struct m0_dtm0_tx_desc       *dst)
 {
 	int      rc;
 
 	M0_PRE(m0_dtm0_tx_desc__invariant(src));
 
-	rc = m0_dtm0_tx_desc_init(dst, src->dtd_pg.dtpg_nr);
+	rc = m0_dtm0_tx_desc_init(log, tx, seg, dst, src->dtd_pg.dtpg_nr);
 	if (rc != 0)
 		return rc;
 
@@ -79,20 +82,35 @@ M0_INTERNAL int m0_dtm0_tx_desc_copy(const struct m0_dtm0_tx_desc *src,
 	return 0;
 }
 
-M0_INTERNAL int m0_dtm0_tx_desc_init(struct m0_dtm0_tx_desc *td,
-				     uint32_t nr_pa)
+M0_INTERNAL int m0_dtm0_tx_desc_init(struct m0_be_dtm0_log  *log,
+                                     struct m0_be_tx        *tx,
+                                     struct m0_be_seg       *seg,
+                                     struct m0_dtm0_tx_desc *td,
+				     uint32_t                nr_pa)
 {
-	M0_ALLOC_ARR(td->dtd_pg.dtpg_pa, nr_pa);
-	if (td->dtd_pg.dtpg_pa == NULL)
-		return M0_ERR(-ENOMEM);
+	if (log->dl_ispstore) {
+		M0_BE_ALLOC_ARR_SYNC(td->dtd_pg.dtpg_pa, nr_pa, seg, tx);
+	} else {
+		M0_ALLOC_ARR(td->dtd_pg.dtpg_pa, nr_pa);
+		if (td->dtd_pg.dtpg_pa == NULL)
+			return M0_ERR(-ENOMEM);
+	}
+
 	td->dtd_pg.dtpg_nr = nr_pa;
 	M0_POST(m0_dtm0_tx_desc__invariant(td));
 	return 0;
 }
 
-M0_INTERNAL void m0_dtm0_tx_desc_fini(struct m0_dtm0_tx_desc *td)
+M0_INTERNAL void m0_dtm0_tx_desc_fini(struct m0_be_dtm0_log  *log,
+                                      struct m0_be_tx        *tx,
+                                      struct m0_be_seg       *seg,
+                                      struct m0_dtm0_tx_desc *td)
 {
-	m0_free(td->dtd_pg.dtpg_pa);
+	if (log->dl_ispstore)
+		M0_BE_FREE_PTR_SYNC(td->dtd_pg.dtpg_pa, seg tx);
+	else
+		m0_free(td->dtd_pg.dtpg_pa);
+
 	M0_SET0(td);
 }
 
