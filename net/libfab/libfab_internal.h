@@ -74,7 +74,6 @@ struct m0_fab__fab {
 	struct fi_info    *fab_fi;             /* Fabric interface info */
 	struct fid_fabric *fab_fab;            /* Fabric fid */
 	struct fid_domain *fab_dom;            /* Domain fid */
-	struct fid_ep     *fab_rctx;           /* Shared recv context */
 };
 
 struct m0_fab__ep_name {
@@ -95,8 +94,10 @@ struct m0_fab__active_ep {
 };
 
 struct m0_fab__passive_ep {
-	struct fid_pep        *pep_pep;        /* Passive endpoint */
-	struct m0_fab__ep_res  pep_ep_res;     /* Endpoint resources */
+	struct fid_pep           *pep_pep;        /* Passive endpoint */
+	struct m0_fab__active_ep *pep_tx_ep;
+	struct m0_fab__active_ep *pep_rx_ep;
+	struct m0_fab__ep_res     pep_ep_res;     /* Endpoint resources */
 };
 
 struct m0_fab__ep {
@@ -111,8 +112,9 @@ struct m0_fab__tm {
 	struct m0_net_transfer_mc *ftm_net_ma;  /* Generic transfer machine */
 	struct m0_thread           ftm_poller;  /* Poller thread */
 	struct fid_wait           *ftm_waitset;
-	struct m0_fab__fab         ftm_fab;
+	struct m0_fab__fab        *ftm_fab;
 	struct m0_fab__ep         *ftm_pep;     /* Passive ep(listening mode) */
+	struct fid_ep             *ftm_rctx;    /* Shared recv context */
 	struct fid_cq             *ftm_tx_cq;   /* Transmit Completion Queue */
 	bool                       ftm_shutdown;/* tm Shutdown flag */
 	struct m0_tl               ftm_rcvbuf;  /* List of recv buffers */
